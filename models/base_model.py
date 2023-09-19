@@ -1,44 +1,62 @@
 #!/usr/bin/python3
-"""This module defines a base class for all models in our hbnb clone"""
-import uuid
+"""This module define BaseModel class which defines all
+common attrbute and methods for subclasses.
+
+Module Description:
+The BaseModel module defines the foundational class for all other
+classes in the project. It contains attributes and methods that are
+common to all classes, ensuring consistent behavior and data structure
+across instances. The class is responsible for generating unique IDs,
+managing creation and modification timestamps, providing a dictionary
+representation of instances, and facilitating serialization and
+deserialization through JSON.
+"""
 from datetime import datetime
+from uuid import uuid4
+import models
 
 
 class BaseModel:
-    """A base class for all hbnb models"""
+    """BaseModel class  definition"""
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
-        if not kwargs:
-            from models import storage
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            storage.new(self)
-        else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
-            self.__dict__.update(kwargs)
+        """Instatiate the BaseModel instance with unique id,
+        the date the instance or object is created and the date
+        at the which the instance or object was modified or updated.
+
+        args:
+            args: won’t be used
+            kwargs: key/value pair of the BaseModel instance to be used
+                    create another BaseModel object.
+        """
+        self.id = str(uuid4())
+        self.created_at = self.updated_at = datetime.today()
+        if kwargs:
+            for key, value in kwargs.items():
+                if key != "__class__":
+                    if key == "created_at" or key == "updated_at":
+                        value = datetime.strptime(value,
+                                                  "%Y-%m-%dT%H:%M:%S.%f")
+                    setattr(self, key, value)
 
     def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        """Returns the string representation of the BaseModel"""
+        return ("[{}] ({}) {}".format(self.__class__.__name__,
+                                      self.id, self.__dict__))
 
     def save(self):
-        """Updates updated_at with current time when instance is changed"""
-        from models import storage
+        """Sets the date at which the BaseModel object has been updated"""
         self.updated_at = datetime.now()
-        storage.save()
+        models.storage.new(self)
+        models.storage.save()
 
     def to_dict(self):
-        """Convert instance into dict format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        return dictionary
+        """Returns BaseModel dictionary consisting all attributes
+        and their values.
+        """
+        model_dict = {}
+        model_dict["__class__"] = self.__class__.__name__
+        for key, value in self.__dict__.items():
+            if key == "created_at" or key == "updated_at":
+                value = value.isoformat()
+            model_dict[key] = value
+        return (model_dict)

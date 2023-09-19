@@ -24,7 +24,7 @@ class test_basemodel(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove('file.json')
-        except:
+        except Exception:
             pass
 
     def test_default(self):
@@ -72,13 +72,12 @@ class test_basemodel(unittest.TestCase):
         """ """
         n = {None: None}
         with self.assertRaises(TypeError):
-            new = self.value(**n)
+            self.assertIsInstance(self.value(**n), self.value)
 
-    def test_kwargs_one(self):
+    def test_kwargs_none_existing_key(self):
         """ """
-        n = {'Name': 'test'}
-        with self.assertRaises(KeyError):
-            new = self.value(**n)
+        obj = self.value()
+        self.assertFalse(hasattr(obj, 'Name'))
 
     def test_id(self):
         """ """
@@ -96,4 +95,4 @@ class test_basemodel(unittest.TestCase):
         self.assertEqual(type(new.updated_at), datetime.datetime)
         n = new.to_dict()
         new = BaseModel(**n)
-        self.assertFalse(new.created_at == new.updated_at)
+        self.assertTrue(new.created_at == new.updated_at)

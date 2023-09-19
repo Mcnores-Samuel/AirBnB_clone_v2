@@ -41,13 +41,36 @@ class HBNBCommand(cmd.Cmd):
         if not line:
             print("** class name missing **")
             return False
-        if line in class_list:
-            class_obj = class_list[line]()
-            class_obj.save()
-            print(class_obj.id)
+
+        args = line.split(" ")
+        class_name = args[0]
+        dict_obj = {}
+        class_obj = None
+
+        if len(args) > 1:
+            for arg in args[1:]:
+                props = arg.split("=")
+                if props[1][0] == '"':
+                    value = props[1].strip('\"').replace('_', ' ')
+                    props[1] = value
+                else:
+                    try:
+                        value = eval(props[1])
+                        props[1] = value
+                    except Exception:
+                        continue
+                dict_obj[props[0]] = props[1]
+
+        if dict_obj == {}:
+            if line in class_list:
+                class_obj = class_list[class_name]()
+            else:
+                print("** class doesn't exist **")
+                return False
         else:
-            print("** class doesn't exist **")
-            return False
+            class_obj = class_list[class_name](**dict_obj)
+        class_obj.save()
+        print(class_obj.id)
 
     def do_show(self, line):
         """Prints the string representation of an instance based
