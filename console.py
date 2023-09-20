@@ -149,9 +149,9 @@ class HBNBCommand(cmd.Cmd):
         for obj in data.keys():
             instance_type = obj.split(".")[0]
             if args[0] and args[0] == instance_type:
-                result.append(str(data[obj]))
+                result.append(data[obj])
             if not line:
-                result.append(str(data[obj]))
+                result.append(data[obj])
         print(result)
 
     def do_update(self, line):
