@@ -16,8 +16,10 @@ from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import models
+from uuid import uuid4
 
 Base = declarative_base()
+
 
 class BaseModel:
     """BaseModel class definition"""
@@ -25,19 +27,25 @@ class BaseModel:
     created_at = Column('created at', DateTime, nullable=False,
                         default=datetime.utcnow())
     updated_at = Column('updated_at', DateTime, nullable=False,
-                        default=datetime.utcnow()) 
+                        default=datetime.utcnow())
+
     def __init__(self, *args, **kwargs):
-        """Instantiate the BaseModel instance with a unique id, the date the instance or object is created, and the date at which the instance or object was modified or updated.
+        """Instantiate the BaseModel instance with a unique id,
+        the date the instance or object is created,
+        and the date at which the instance or object was modified or updated.
 
         Args:
             args: Won't be used.
             kwargs: Key/value pairs to create another BaseModel object.
         """
+        self.id = str(uuid4())
+        self.created_at = self.updated_at = datetime.utcnow()
         if kwargs:
             for key, value in kwargs.items():
                 if key != "__class__":
                     if key == "created_at" or key == "updated_at":
-                        value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                        value = datetime.strptime(value,
+                                                  "%Y-%m-%dT%H:%M:%S.%f")
                     setattr(self, key, value)
         else:
             self.id = str(uuid4())
@@ -45,17 +53,21 @@ class BaseModel:
 
     def __str__(self):
         """Returns the string representation of the BaseModel"""
-        return ("[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__))
+        return ("[{}] ({}) {}".format(self.__class__.__name__,
+                                      self.id, self.__dict__))
 
     def save(self):
-        """Sets the date at which the BaseModel object has been updated and saves it to the storage."""
+        """Sets the date at which the BaseModel object has been updated
+        and saves it to the storage.
+        """
         self.updated_at = datetime.utcnow()
         models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
         """Returns a dictionary representation of the BaseModel object."""
-        model_dict = dict(self.__dict__)
+        model_dict = {}
+        model_dict["__class__"] = self.__class__.__name__
         if "_sa_instance_state" in model_dict:
             del model_dict["_sa_instance_state"]
         model_dict["created_at"] = self.created_at.isoformat()
