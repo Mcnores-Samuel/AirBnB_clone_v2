@@ -16,13 +16,15 @@ from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import models
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import String, Column, DateTime
 from uuid import uuid4
 
 Base = declarative_base()
 
 
 class BaseModel:
-    """BaseModel class definition"""
+    """BaseModel class  definition"""
     id = Column('id', String(60), nullable=False, primary_key=True)
     created_at = Column('created at', DateTime, nullable=False,
                         default=datetime.utcnow())
@@ -53,6 +55,7 @@ class BaseModel:
 
     def __str__(self):
         """Returns the string representation of the BaseModel"""
+        self.__dict__.pop('_sa_instance_state', None)
         return ("[{}] ({}) {}".format(self.__class__.__name__,
                                       self.id, self.__dict__))
 
@@ -68,11 +71,13 @@ class BaseModel:
         """Returns a dictionary representation of the BaseModel object."""
         model_dict = {}
         model_dict["__class__"] = self.__class__.__name__
-        if "_sa_instance_state" in model_dict:
-            del model_dict["_sa_instance_state"]
-        model_dict["created_at"] = self.created_at.isoformat()
-        model_dict["updated_at"] = self.updated_at.isoformat()
-        return model_dict
+        for key, value in self.__dict__.items():
+            if key == "created_at" or key == "updated_at":
+                value = value.isoformat()
+            model_dict[key] = value
+        model_dict.pop('_sa_instance_state', None)
+        return (model_dict)
+
 
     def delete(self):
         """Deletes the current instance from storage."""
