@@ -14,10 +14,20 @@ deserialization through JSON.
 from datetime import datetime
 from uuid import uuid4
 import models
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import String, Column, DateTime
+
+Base = declarative_base()
 
 
 class BaseModel:
     """BaseModel class  definition"""
+    id = Column('id', String(60), nullable=False, primary_key=True)
+    created_at = Column('created_at', DateTime, nullable=False,
+                        default=datetime.utcnow())
+    updated_at = Column('updated_at', DateTime, nullable=False,
+                        default=datetime.utcnow())
+
     def __init__(self, *args, **kwargs):
         """Instatiate the BaseModel instance with unique id,
         the date the instance or object is created and the date
@@ -29,7 +39,7 @@ class BaseModel:
                     create another BaseModel object.
         """
         self.id = str(uuid4())
-        self.created_at = self.updated_at = datetime.today()
+        self.created_at = self.updated_at = datetime.utcnow()
         if kwargs:
             for key, value in kwargs.items():
                 if key != "__class__":
@@ -40,6 +50,7 @@ class BaseModel:
 
     def __str__(self):
         """Returns the string representation of the BaseModel"""
+        self.__dict__.pop('_sa_instance_state', None)
         return ("[{}] ({}) {}".format(self.__class__.__name__,
                                       self.id, self.__dict__))
 
@@ -59,4 +70,11 @@ class BaseModel:
             if key == "created_at" or key == "updated_at":
                 value = value.isoformat()
             model_dict[key] = value
+        model_dict.pop('_sa_instance_state', None)
         return (model_dict)
+
+    def delete(self):
+        """Deletes the current instance from the storage (models.storage)
+        by calling the method delete
+        """
+        models.storage.delete(self)

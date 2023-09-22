@@ -62,7 +62,7 @@ class HBNBCommand(cmd.Cmd):
                 dict_obj[props[0]] = props[1]
 
         if dict_obj == {}:
-            if line in class_list:
+            if class_name in class_list:
                 class_obj = class_list[class_name]()
             else:
                 print("** class doesn't exist **")
@@ -146,12 +146,12 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print("** class doesn't exist **")
                 return False
-        for obj in data.keys():
-            instance_type = obj.split(".")[0]
+        for key, obj in data.items():
+            instance_type = key.split(".")[0]
             if args[0] and args[0] == instance_type:
-                result.append(data[obj])
+                result.append(obj.__str__())
             if not line:
-                result.append(data[obj])
+                result.append(obj.__str__())
         print(result)
 
     def do_update(self, line):
