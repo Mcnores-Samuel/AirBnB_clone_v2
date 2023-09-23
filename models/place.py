@@ -13,9 +13,11 @@ from sqlalchemy.orm import relationship
 place_amenity_table = Table("place_amenity", Base.metadata,
                             Column('place_id', String(60),
                                    ForeignKey("places.id"),
+                                   primary_key=True,
                                    nullable=False),
                             Column('amenity_id', String(60),
                                    ForeignKey("amenities.id"),
+                                   primary_key=True,
                                    nullable=False)
                             )
 
@@ -63,8 +65,7 @@ class Place(BaseModel, Base):
         amenity_ids that contains all Amenity.id linked to the Place
         """
         amenities_list = []
-        amenities_objs = list(models.storage.all(Amenity).values())
-        for amenity in amenities_objs:
+        for amenity in list(models.storage.all(Amenity).values()):
             if amenity.id in self.amenity_ids:
                 amenities_list.append(amenity)
         return amenities_list
