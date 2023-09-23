@@ -21,8 +21,6 @@ Test the to_dict method:
     Confirm that the created_at and updated_at attributes are properly
     converted to ISO format
 """
-#!/usr/bin/python3
-"""Defines unnittests for models/base_model.py."""
 import os
 import pep8
 import unittest
