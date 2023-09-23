@@ -61,7 +61,7 @@ class DBStorage:
             return {"{}.{}".format(type(obj).__name__,
                                    obj.id): obj for obj in all_objs}
         else:
-            classes = [State, City, User, Place, Review]
+            classes = [State, City, User, Place, Review, Amenity]
             data = {}
             for cls in classes:
                 query = self.__session.query(cls).all()
