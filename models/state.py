@@ -30,7 +30,7 @@ class State(BaseModel, Base):
             between State and City
             """
             cities_list = []
-            cities_objs = list(models.storage.all(City).values())
+            cities_objs = list(models.storage.all('City').values())
             for city in cities_objs:
                 if city.state_id == self.id:
                     cities_list.append(city)

@@ -28,6 +28,17 @@ class_list = {
 
 
 class HBNBCommand(cmd.Cmd):
+    """Entry point for the command interpreter and is used
+    manage the objects of the application.
+
+    operations that can be performed or be done with the command
+    interpreter are as follows:
+    - Create a new object (ex: a new User or a new Place)
+    - Retrieve an object from a file, a database etc…
+    - Do operations on objects (count, compute stats, etc…)
+    - Update attributes of an object
+    - Destroy an object
+    """
     prompt = "(hbnb) "
 
     def do_create(self, line):

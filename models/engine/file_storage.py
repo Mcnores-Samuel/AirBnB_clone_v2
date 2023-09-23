@@ -17,7 +17,14 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
+        classes = {
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+                  }
         if cls:
+            if type(cls) == str:
+                cls = classes[cls]
             data = self.__objects
             all_cls_objs = {}
             for key in data.keys():
