@@ -31,27 +31,27 @@ def do_deploy(archive_path):
     if not path.exists(archive_path):
         return False
 
-    filename = path.basename(archive_path)
+    filename = str(archive_path).split("/")[-1]
     releases = "/data/web_static/releases"
-    uncompfile = path.splitext(filename)[0]
+    uncompfile = str(filename).split('.')[0]
+
+    put(archive_path, '/tmp/{}'.format(filename))
 
     try:
-        put(archive_path, '/tmp/')
-
-        run('mkdir -p {}/{}'.format(releases, uncompfile))
-        run('tar -xzf /tmp/{} -C {}/{}/'.format(filename, releases,
+        run('mkdir -p /data/web_static/releases/{}/'.format(uncompfile))
+        run('tar -xzf /tmp/{} -C {}/{}/'.format(filename,
+                                                releases,
                                                 uncompfile))
-
         run('rm /tmp/{}'.format(filename))
-
-        run('rsync -a {}/{}/web_static/ {}/{}'.format(
-            releases, uncompfile, releases, uncompfile))
+        run('rsync -a {}/{}/web_static/ {}/{}'.format(releases,
+                                                      uncompfile,
+                                                      releases,
+                                                      uncompfile))
         run('rm -rf {}/{}/web_static/'.format(releases, uncompfile))
 
         run('rm -rf /data/web_static/current')
         run('ln -s {}/{} /data/web_static/current'.format(releases,
                                                           uncompfile))
-
         return True
     except Exception:
         return False
