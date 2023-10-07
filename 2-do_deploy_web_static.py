@@ -28,34 +28,30 @@ def do_deploy(archive_path):
     Returns:
        True if all operations have been done correctly, otherwise returns False
     """
-    if path.isfile(archive_path) is False:
+    if not path.exists(archive_path):
         return False
-    filename = archive_path.split("/")[-1]
-    Uncompfile = filename.split(".")[0]
 
-    if put(archive_path, "/tmp/{}".format(filename)).failed is True:
+    filename = path.basename(archive_path)
+    releases = "/data/web_static/releases"
+    uncompfile = path.splitext(filename)[0]
+
+    try:
+        put(archive_path, '/tmp/')
+
+        run('mkdir -p {}/{}'.format(releases, uncompfile))
+        run('tar -xzf /tmp/{} -C {}/{}/'.format(filename, releases,
+                                                uncompfile))
+
+        run('rm /tmp/{}'.format(filename))
+
+        run('rsync -a {}/{}/web_static/ {}/{}'.format(
+            releases, uncompfile, releases, uncompfile))
+        run('rm -rf {}/{}/web_static/'.format(releases, uncompfile))
+
+        run('rm -rf /data/web_static/current')
+        run('ln -s {}/{} /data/web_static/current'.format(releases,
+                                                          uncompfile))
+
+        return True
+    except Exception:
         return False
-    if run("rm -rf /data/web_static/releases/{}/".
-           format(Uncompfile)).failed is True:
-        return False
-    if run("mkdir -p /data/web_static/releases/{}/".
-           format(Uncompfile)).failed is True:
-        return False
-    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
-           format(filename, Uncompfile)).failed is True:
-        return False
-    if run("rm /tmp/{}".format(filename)).failed is True:
-        return False
-    if run("mv /data/web_static/releases/{}/web_static/* "
-           "/data/web_static/releases/{}/".format(Uncompfile,
-                                                  Uncompfile)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/releases/{}/web_static".
-           format(Uncompfile)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/current").failed is True:
-        return False
-    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
-           format(Uncompfile)).failed is True:
-        return False
-    return True
