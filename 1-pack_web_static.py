@@ -24,8 +24,6 @@ def do_pack():
         time = time[1:]
     if not path.exists('versions'):
         local('mkdir -p versions')
-    else:
-        print("already exists")
     arch = "versions/web_static{}{}.tgz".format(date, time)
     result = local('tar -cvzf {} web_static'.format(arch)).failed
 
