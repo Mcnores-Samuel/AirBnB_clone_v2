@@ -56,7 +56,7 @@ printf %s "server {
         listen 80 default_server;
         listen [::]:80 default_server;
         add_header X-Served-By $HOSTNAME;
-	root /data/web_static/current;
+	root /var/www/html;
 	index index.html index.html;
 
 	location /hbnb_static {
