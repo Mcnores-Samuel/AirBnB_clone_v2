@@ -23,11 +23,13 @@ def do_pack():
     if time[0] == '0':
         time = time[1:]
     if not path.exists('versions'):
-        local('mkdir versions')
+        local('mkdir -p versions')
     else:
         print("already exists")
     arch = "versions/web_static{}{}.tgz".format(date, time)
-    local('tar -czf {} web_static'.format(arch))
+    result = local('tar -cvzf {} web_static'.format(arch)).failed
 
-    if path.exists(arch):
+    if path.exists(arch) and result is False:
         return arch
+    else:
+        return None
