@@ -9,13 +9,11 @@ $symlink = '/data/web_static/current'
 
 package { 'nginx':
   ensure => 'installed',
-}
+} ->
 
 file { $data_test_dirs:
   ensure => 'directory',
-  owner  => 'ubuntu',
-  group  => 'ubuntu',
-}
+} ->
 
 file { $test_file:
   ensure  => 'file',
@@ -27,18 +25,18 @@ file { $test_file:
   </body>
   </html>",
   require => File[$data_test_dirs],
-  owner   => 'ubuntu',
-  group   => 'ubuntu',
-}
+} ->
 
 file {
   $symlink:
   ensure  => 'link',
   target  => '/data/web_static/releases/test/',
   require => File[$test_file],
-  owner   => 'ubuntu',
-  group   => 'ubuntu',
-}
+} ->
+
+exec { 'chown -R cryptics-core-based:cryptics-core-based /data/':
+  path => '/usr/bin/:/usr/local/bin/:/bin/'
+} ->
 
 file {
   '/etc/nginx/sites-available/default':
@@ -46,7 +44,7 @@ file {
   content => "server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        add_header X-Served-By ${HOSTNAME};
+        add_header X-Served-By ${hostname};
         root /var/www/html;
         index index.html index.html;
 
@@ -64,10 +62,9 @@ file {
                 root /var/www/nginx-html;
                       internal;
 	}",
-}
+} ->
 
-exec { 'restart_nginx':
-  command => 'sudo service nginx restart',
-  path    => ['/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-  require => File['/etc/nginx/sites-available/default'],
+exec { 'nginx restart':
+  command => '/etc/init.d/nginx restart',
+  path => '/etc/init.d/',
 }
