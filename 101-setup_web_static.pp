@@ -1,71 +1,89 @@
 #sets up your web servers for the deployment of web_static
-$data_test_dirs = ['/data/', '/data/web_static/',
-                  '/data/web_static/releases/',
-                  '/data/web_static/shared/',
-                  '/data/web_static/releases/test/']
+$nginx_conf = "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By ${hostname};
+    root   /var/www/html;
+    index  index.html index.htm;
 
-$test_file = '/data/web_static/releases/test/index.html'
-$symlink = '/data/web_static/current'
+    location /hbnb_static {
+        alias /data/web_static/current;
+        index index.html index.htm;
+    }
+
+    location /redirect_me {
+        return 301 http://cuberule.com/;
+    }
+
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/html;
+      internal;
+    }
+}"
 
 package { 'nginx':
-  ensure => 'installed',
-} ->
+  ensure   => 'present',
+  provider => 'apt'
+}
 
-file { $data_test_dirs:
-  ensure => 'directory',
-} ->
+-> file { '/data':
+  ensure  => 'directory'
+}
 
-file { $test_file:
-  ensure  => 'file',
-  content => "<html>
-  <head>
-  </head>
-  <body>
-    Holberton School
-  </body>
-  </html>",
-  require => File[$data_test_dirs],
-} ->
+-> file { '/data/web_static':
+  ensure => 'directory'
+}
 
-file {
-  $symlink:
-  ensure  => 'link',
-  target  => '/data/web_static/releases/test/',
-  require => File[$test_file],
-} ->
+-> file { '/data/web_static/releases':
+  ensure => 'directory'
+}
 
-exec { 'chown -R cryptics-core-based:cryptics-core-based /data/':
-  path => '/usr/bin/:/usr/local/bin/:/bin/'
-} ->
+-> file { '/data/web_static/releases/test':
+  ensure => 'directory'
+}
 
-file {
-  '/etc/nginx/sites-available/default':
+-> file { '/data/web_static/shared':
+  ensure => 'directory'
+}
+
+-> file { '/data/web_static/releases/test/index.html':
   ensure  => 'present',
-  content => "server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        add_header X-Served-By '${hostname}';
-        root /var/www/html;
-        index index.html index.html;
+  content => "Holberton School Puppet\n"
+}
 
-        location /hbnb_static {
-          alias /data/web_static/current;
-          index index.html index.html;
-        }
+-> file { '/data/web_static/current':
+  ensure => 'link',
+  target => '/data/web_static/releases/test'
+}
 
-        location /redirect_me {
-                return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-        }
+-> exec { 'chown -R ubuntu:ubuntu /data/':
+  path => '/usr/bin/:/usr/local/bin/:/bin/'
+}
 
-        error_page 404 /404.html;
-        location /404.html {
-                root /var/www/nginx-html;
-                      internal;
-	}",
-} ->
+file { '/var/www':
+  ensure => 'directory'
+}
 
-exec { 'nginx restart':
-  command => '/etc/init.d/nginx restart',
-  path    => '/etc/init.d/',
-  require => File['/etc/nginx/sites-available/default'],
+-> file { '/var/www/html':
+  ensure => 'directory'
+}
+
+-> file { '/var/www/html/index.html':
+  ensure  => 'present',
+  content => "Holberton School Nginx\n"
+}
+
+-> file { '/var/www/html/404.html':
+  ensure  => 'present',
+  content => "Ceci n'est pas une page\n"
+}
+
+-> file { '/etc/nginx/sites-available/default':
+  ensure  => 'present',
+  content => $nginx_conf
+}
+
+-> exec { 'nginx restart':
+  path => '/etc/init.d/'
 }

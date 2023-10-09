@@ -12,7 +12,7 @@ LINK="/data/web_static/current"
 apt-get update
 
 # Installs Nginx if it not already installed
-if [ ! -x "/usr/bin/nginx" ]; then
+if [ ! -x "/usr/sbin/nginx" ]; then
 	apt-get install -y nginx
 fi
 
