@@ -44,7 +44,7 @@ file {
   content => "server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        add_header X-Served-By ${hostname};
+        add_header X-Served-By '${hostname}';
         root /var/www/html;
         index index.html index.html;
 
@@ -66,5 +66,6 @@ file {
 
 exec { 'nginx restart':
   command => '/etc/init.d/nginx restart',
-  path => '/etc/init.d/',
+  path    => '/etc/init.d/',
+  require => File['/etc/nginx/sites-available/default'],
 }
