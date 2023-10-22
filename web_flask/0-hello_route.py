@@ -5,7 +5,7 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 def index_page():
     """Displays Hello HBNB text of an index page"""
     return "Hello HBNB!"
