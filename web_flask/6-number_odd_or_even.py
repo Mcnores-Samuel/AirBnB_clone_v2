@@ -61,7 +61,7 @@ def number_odd_or_even(n):
     """Renders a template html if n is an integer
     and the template displays a number on either is odd or even.
     """
-    return render_template('6-number_odd_or_even.html', number=n)
+    return render_template('6-number_odd_or_even.html', n=n)
 
 
 if __name__ == "__main__":
