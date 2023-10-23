@@ -56,10 +56,16 @@ class DBStorage:
         in a dictionary format with keys in the form of "ClassName.ObjectID"
         and values as the corresponding objects.
         """
-        if cls:
-            all_objs = self.__session.query(cls).all()
-            return {"{}.{}".format(type(obj).__name__,
-                                   obj.id): obj for obj in all_objs}
+        if cls is not None:
+            if type(cls) == str:
+                classes = {
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+                }
+                cls = classes[cls]
+            objs = self.__session.query(cls)
+            return {"{}.{}".format(type(o).__name__, o.id): o for o in objs}
         else:
             classes = [State, City, User, Place, Review, Amenity]
             data = {}

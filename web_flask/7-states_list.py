@@ -12,7 +12,7 @@ def states_list():
     """Queries all objects in the states table from the
     database to the html page
     """
-    states = storage.all("States")
+    states = storage.all("State")
     return render_template('7-states_list.html', states=states)
 
 
