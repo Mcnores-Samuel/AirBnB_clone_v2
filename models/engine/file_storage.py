@@ -85,3 +85,7 @@ class FileStorage:
                     del all_objs[current_obj]
                     self.save()
                     break
+
+    def close(self):
+        """Calls a reload methods and reloads all object"""
+        self.reload()
