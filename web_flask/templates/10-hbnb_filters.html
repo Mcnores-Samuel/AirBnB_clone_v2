@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<HTML lang="en">
+    <HEAD>
+        <META charset="UTF-8">
+        <META name="viewport" content="width=device-width, initial-scale=1.0">
+        <TITLE>Airbnb clone</TITLE>
+        <LInk rel="stylesheet" href="../static/styles/4-common.css">
+        <LInk rel="stylesheet" href="../static/styles/3-header.css">
+        <LInk rel="stylesheet" href="../static/styles/3-footer.css">
+        <LInk rel="stylesheet" href="../static/styles/6-filters.css">
+        <LInk rel="icon" href="../static/images/icon.png" type="image/png">
+    </HEAD>
+    <BODY>
+        <HEADER><DIV class="logo"></DIV></HEADER>
+        <DIV class="container">
+            <SECTION class="filters">
+                <DIV class="locations">
+                    <H3>states</H3>
+                    <H4>&nbsp;</H4>
+                    <UL class="popover">
+                        {% for state in states.values()|sort(attribute="name") %}
+                        <LI>
+                            <h2>{{ state.name }}</h2>
+                            <UL>
+                                {% for city in state.cities|sort(attribute="name") %}
+                                <LI>{{ city.name }}</LI>
+                                {% endfor %}
+                            </UL>
+                        </LI>
+                        {% endfor %}
+                    </UL>
+                </DIV>
+                <DIV class="amenities">
+                    <H3>Amenities</H3>
+                    <H4>&nbsp;</H4>
+                    <UL class="popover">
+                        {% for amenity in amenities.values()|sort(attribute="name") %}
+                        <LI>{{ amenity.name }}</LI>
+                        {% endfor %}
+                    </UL>
+                </DIV>
+                <BUTTON>Search</BUTTON>
+            </SECTION>
+        </DIV>
+        <FOOTER>Best School</FOOTER>
+    </BODY>
+</HTML>
